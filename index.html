@@ -370,239 +370,300 @@
     </div>
 
     <script>
-        // Configuration - USE YOUR GOOGLE SHEETS EMBED URL HERE
-        const SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSlQLcK_Ktw2zemNHDZ_70giWPqT54Mvoci_dJxQz1RWYhe94UaDQLPQU89DUYLTY-ow7s2sWa-PB0h/pubhtml?gid=0&single=true&widget=true&headers=false';
-        const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
+    // Configuration
+    const SHEET_ID = '1vY0L3v-iXj2NcU7SRgucuJTKZEOYOmZYTnAMfrO1Atw'; // From your URL
+    const SHEET_NAME = 'Active tickets'; // Your sheet name
+    const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
+    
+    // State
+    let allTickets = [];
+    let autoRefreshInterval;
+    
+    // DOM Elements
+    const searchInput = document.getElementById('searchInput');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const ticketsBody = document.getElementById('ticketsBody');
+    const ticketsTable = document.getElementById('ticketsTable');
+    const ticketsLoading = document.getElementById('ticketsLoading');
+    const lastUpdatedTime = document.getElementById('lastUpdatedTime');
+    const totalTicketsEl = document.getElementById('totalTickets');
+    const todayTicketsEl = document.getElementById('todayTickets');
+    const uniquePersonnelEl = document.getElementById('uniquePersonnel');
+    const regulationAreasEl = document.getElementById('regulationAreas');
 
-        // State
-        let allTickets = [];
-        let autoRefreshInterval;
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        loadTickets();
+        setupEventListeners();
+        startAutoRefresh();
+    });
 
-        // DOM Elements
-        const searchInput = document.getElementById('searchInput');
-        const refreshBtn = document.getElementById('refreshBtn');
-        const ticketsBody = document.getElementById('ticketsBody');
-        const ticketsTable = document.getElementById('ticketsTable');
-        const ticketsLoading = document.getElementById('ticketsLoading');
-        const lastUpdatedTime = document.getElementById('lastUpdatedTime');
-        const totalTicketsEl = document.getElementById('totalTickets');
-        const todayTicketsEl = document.getElementById('todayTickets');
-        const uniquePersonnelEl = document.getElementById('uniquePersonnel');
-        const regulationAreasEl = document.getElementById('regulationAreas');
+    // Event Listeners
+    function setupEventListeners() {
+        refreshBtn.addEventListener('click', loadTickets);
+        searchInput.addEventListener('input', filterTickets);
+        document.getElementById('autoRefreshToggle').addEventListener('change', toggleAutoRefresh);
+    }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            loadTickets();
-            setupEventListeners();
-            startAutoRefresh();
-        });
+    // Auto-refresh
+    function startAutoRefresh() {
+        if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+        autoRefreshInterval = setInterval(loadTickets, AUTO_REFRESH_INTERVAL);
+    }
 
-        // Event Listeners
-        function setupEventListeners() {
-            refreshBtn.addEventListener('click', loadTickets);
-            searchInput.addEventListener('input', filterTickets);
-            document.getElementById('autoRefreshToggle').addEventListener('change', toggleAutoRefresh);
-        }
+    function stopAutoRefresh() {
+        if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+    }
 
-        // Auto-refresh
-        function startAutoRefresh() {
-            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
-            autoRefreshInterval = setInterval(loadTickets, AUTO_REFRESH_INTERVAL);
-        }
+    function toggleAutoRefresh(e) {
+        if (e.target.checked) startAutoRefresh();
+        else stopAutoRefresh();
+    }
 
-        function stopAutoRefresh() {
-            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
-        }
+    // NEW & SIMPLIFIED: Load Tickets from Google Sheets
+    async function loadTickets() {
+        try {
+            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+            refreshBtn.disabled = true;
+            ticketsLoading.style.display = 'block';
+            ticketsTable.style.display = 'none';
 
-        function toggleAutoRefresh(e) {
-            if (e.target.checked) startAutoRefresh();
-            else stopAutoRefresh();
-        }
-
-        // Load Tickets from Google Sheets
-        async function loadTickets() {
-            try {
-                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-                refreshBtn.disabled = true;
-
-                // Use a CORS proxy to avoid issues
-                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(SHEET_URL)}`;
-                const response = await fetch(proxyUrl);
-                const data = await response.json();
-
-                // Parse the HTML table
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(data.contents, 'text/html');
-                const rows = doc.querySelectorAll('table tbody tr');
-
-                // Process rows
-                const tickets = [];
-                const headerMap = {
-                    0: 'Ticket ID', 1: 'Date', 2: 'Talent Name',
-                    3: 'Problem Encountered', 4: 'Description',
-                    5: 'Preferred MIS Personnel', 6: 'Talent Email',
-                    7: 'Regulation Area'
+            // METHOD 1: Direct Google Sheets JSON feed (most reliable)
+            const jsonUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&tq&sheet=${encodeURIComponent(SHEET_NAME)}`;
+            
+            console.log('Fetching from:', jsonUrl);
+            
+            const response = await fetch(jsonUrl);
+            const text = await response.text();
+            
+            // Parse the Google Visualization API response
+            const json = JSON.parse(text.substring(47, text.length-2));
+            
+            // Process the data
+            const tickets = [];
+            const rows = json.table.rows;
+            
+            for (let i = 0; i < rows.length; i++) {
+                const cells = rows[i].c;
+                const ticket = {
+                    'Ticket ID': cells[0] ? cells[0].v : '',
+                    'Date': cells[1] ? formatDate(cells[1].v) : '',
+                    'Talent Name': cells[2] ? cells[2].v : '',
+                    'Problem Encountered': cells[3] ? cells[3].v : '',
+                    'Description': cells[4] ? cells[4].v : '',
+                    'Preferred MIS Personnel': cells[5] ? cells[5].v : '',
+                    'Talent Email': cells[6] ? cells[6].v : '',
+                    'Regulation Area': cells[7] ? cells[7].v : ''
                 };
+                tickets.push(ticket);
+            }
 
-                let startRow = 0;
-                if (rows.length > 0) {
-                    const firstRowCells = rows[0].querySelectorAll('td, th');
-                    if (firstRowCells.length > 0 && firstRowCells[0].textContent.includes('Ticket')) {
-                        startRow = 1; // Skip header row
-                    }
+            allTickets = tickets;
+            updateStats(tickets);
+            renderTickets(tickets);
+            updateLastUpdatedTime();
+
+        } catch (error) {
+            console.error('Error loading tickets:', error);
+            
+            // METHOD 2: Fallback to CSV format
+            try {
+                console.log('Trying CSV fallback...');
+                await loadTicketsCSV();
+            } catch (csvError) {
+                console.error('CSV fallback also failed:', csvError);
+                showError();
+            }
+        } finally {
+            refreshBtn.innerHTML = '<i class="fas fa-redo-alt"></i> Refresh Tickets';
+            refreshBtn.disabled = false;
+        }
+    }
+
+    // Fallback method using CSV
+    async function loadTicketsCSV() {
+        const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+        
+        const response = await fetch(csvUrl);
+        const csvText = await response.text();
+        
+        const tickets = [];
+        const rows = csvText.split('\n');
+        
+        // Skip header row
+        for (let i = 1; i < rows.length; i++) {
+            const columns = rows[i].split(',');
+            if (columns.length >= 8) {
+                const ticket = {
+                    'Ticket ID': columns[0] || '',
+                    'Date': columns[1] || '',
+                    'Talent Name': columns[2] || '',
+                    'Problem Encountered': columns[3] || '',
+                    'Description': columns[4] || '',
+                    'Preferred MIS Personnel': columns[5] || '',
+                    'Talent Email': columns[6] || '',
+                    'Regulation Area': columns[7] || ''
+                };
+                tickets.push(ticket);
+            }
+        }
+        
+        allTickets = tickets;
+        updateStats(tickets);
+        renderTickets(tickets);
+        updateLastUpdatedTime();
+    }
+
+    function formatDate(dateValue) {
+        if (!dateValue) return '';
+        
+        // If it's a serial number (Google Sheets date format)
+        if (typeof dateValue === 'number') {
+            const date = new Date((dateValue - 25569) * 86400 * 1000);
+            return date.toISOString().split('T')[0];
+        }
+        
+        // If it's already a date string
+        return dateValue;
+    }
+
+    function showError() {
+        ticketsLoading.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Failed to load tickets</h3>
+                <p>Possible issues:</p>
+                <ul style="text-align:left; display:inline-block; margin:15px auto;">
+                    <li>Google Sheet is not published</li>
+                    <li>Network or CORS restrictions</li>
+                    <li>Sheet name might be different</li>
+                </ul>
+                <p>Try publishing your sheet: <strong>File → Share → Publish to web</strong></p>
+                <button onclick="loadTickets()" class="refresh-btn" style="margin-top:20px;">
+                    <i class="fas fa-redo-alt"></i> Try Again
+                </button>
+            </div>
+        `;
+    }
+
+    // Update Statistics (unchanged)
+    function updateStats(tickets) {
+        totalTicketsEl.textContent = tickets.length;
+
+        const today = new Date().toISOString().split('T')[0];
+        const todayTickets = tickets.filter(t => {
+            const ticketDate = new Date(t.Date).toISOString().split('T')[0];
+            return ticketDate === today;
+        }).length;
+        todayTicketsEl.textContent = todayTickets;
+
+        const personnelSet = new Set(tickets.map(t => t['Preferred MIS Personnel']).filter(Boolean));
+        uniquePersonnelEl.textContent = personnelSet.size;
+
+        const regulationSet = new Set(tickets.map(t => t['Regulation Area']).filter(Boolean));
+        regulationAreasEl.textContent = regulationSet.size;
+    }
+
+    // Render Tickets to Table (unchanged)
+    function renderTickets(tickets) {
+        if (tickets.length === 0) {
+            ticketsLoading.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>No active tickets found</h3>
+                    <p>When tickets are submitted, they will appear here.</p>
+                </div>
+            `;
+            ticketsTable.style.display = 'none';
+            return;
+        }
+
+        ticketsLoading.style.display = 'none';
+        ticketsTable.style.display = 'table';
+        ticketsBody.innerHTML = '';
+
+        tickets.forEach((ticket, index) => {
+            const row = document.createElement('tr');
+            row.className = 'ticket-row';
+            if (index < 3) row.classList.add('new-ticket');
+
+            // Format date
+            let formattedDate = ticket.Date;
+            try {
+                const dateObj = new Date(ticket.Date);
+                if (!isNaN(dateObj.getTime())) {
+                    formattedDate = dateObj.toLocaleDateString('en-US', {
+                        month: 'short', day: 'numeric', year: 'numeric'
+                    });
                 }
+            } catch (e) {}
 
-                for (let i = startRow; i < rows.length; i++) {
-                    const cells = rows[i].querySelectorAll('td, th');
-                    if (cells.length >= 8) {
-                        const ticket = {};
-                        for (let j = 0; j < 8; j++) {
-                            const key = headerMap[j];
-                            if (key) ticket[key] = cells[j].textContent.trim();
-                        }
-                        tickets.push(ticket);
-                    }
+            // Determine status
+            let statusClass = 'status-new', statusText = 'New';
+            try {
+                const daysOld = (new Date() - new Date(ticket.Date)) / (1000 * 60 * 60 * 24);
+                if (daysOld > 7) {
+                    statusClass = 'status-in-progress';
+                    statusText = 'Older';
+                } else if (daysOld > 3) {
+                    statusClass = 'status-in-progress';
+                    statusText = 'In Progress';
                 }
+            } catch (e) {}
 
-                allTickets = tickets;
-                updateStats(tickets);
-                renderTickets(tickets);
-                updateLastUpdatedTime();
-
-            } catch (error) {
-                console.error('Error loading tickets:', error);
-                ticketsLoading.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>Failed to load tickets</h3>
-                        <p>Please check your connection and try again.</p>
-                        <button onclick="loadTickets()" class="refresh-btn" style="margin-top:20px;">
-                            <i class="fas fa-redo-alt"></i> Retry
-                        </button>
+            row.innerHTML = `
+                <td><span class="ticket-id">${ticket['Ticket ID'] || 'N/A'}</span></td>
+                <td class="date-cell">${formattedDate}</td>
+                <td>
+                    <div class="talent-name">${ticket['Talent Name'] || 'N/A'}</div>
+                    <div class="talent-email">${ticket['Talent Email'] || ''}</div>
+                </td>
+                <td>
+                    <div class="problem-tag">${ticket['Problem Encountered'] || 'Not specified'}</div>
+                    <div class="problem-desc">${ticket['Description'] || 'No description'}</div>
+                </td>
+                <td>
+                    <div class="mis-personnel">
+                        <i class="fas fa-user-cog"></i>
+                        ${ticket['Preferred MIS Personnel'] || 'Unassigned'}
                     </div>
-                `;
-            } finally {
-                refreshBtn.innerHTML = '<i class="fas fa-redo-alt"></i> Refresh Tickets';
-                refreshBtn.disabled = false;
-            }
+                </td>
+                <td><span class="regulation-area">${ticket['Regulation Area'] || 'N/A'}</span></td>
+                <td>
+                    <span class="status-badge ${statusClass}">
+                        <i class="fas fa-circle"></i>${statusText}
+                    </span>
+                </td>
+            `;
+            ticketsBody.appendChild(row);
+        });
+    }
+
+    // Filter Tickets (unchanged)
+    function filterTickets() {
+        const term = searchInput.value.toLowerCase().trim();
+        if (!term) {
+            renderTickets(allTickets);
+            return;
         }
 
-        // Update Statistics
-        function updateStats(tickets) {
-            totalTicketsEl.textContent = tickets.length;
+        const filtered = allTickets.filter(ticket =>
+            Object.values(ticket).some(value =>
+                value && value.toString().toLowerCase().includes(term)
+            )
+        );
+        renderTickets(filtered);
+    }
 
-            const today = new Date().toISOString().split('T')[0];
-            const todayTickets = tickets.filter(t => {
-                const ticketDate = new Date(t.Date).toISOString().split('T')[0];
-                return ticketDate === today;
-            }).length;
-            todayTicketsEl.textContent = todayTickets;
-
-            const personnelSet = new Set(tickets.map(t => t['Preferred MIS Personnel']).filter(Boolean));
-            uniquePersonnelEl.textContent = personnelSet.size;
-
-            const regulationSet = new Set(tickets.map(t => t['Regulation Area']).filter(Boolean));
-            regulationAreasEl.textContent = regulationSet.size;
-        }
-
-        // Render Tickets to Table
-        function renderTickets(tickets) {
-            if (tickets.length === 0) {
-                ticketsLoading.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-clipboard-list"></i>
-                        <h3>No active tickets found</h3>
-                    </div>
-                `;
-                ticketsTable.style.display = 'none';
-                return;
-            }
-
-            ticketsLoading.style.display = 'none';
-            ticketsTable.style.display = 'table';
-            ticketsBody.innerHTML = '';
-
-            tickets.forEach((ticket, index) => {
-                const row = document.createElement('tr');
-                row.className = 'ticket-row';
-                if (index < 3) row.classList.add('new-ticket');
-
-                // Format date
-                let formattedDate = ticket.Date;
-                try {
-                    const dateObj = new Date(ticket.Date);
-                    if (!isNaN(dateObj.getTime())) {
-                        formattedDate = dateObj.toLocaleDateString('en-US', {
-                            month: 'short', day: 'numeric', year: 'numeric'
-                        });
-                    }
-                } catch (e) {}
-
-                // Determine status
-                let statusClass = 'status-new', statusText = 'New';
-                try {
-                    const daysOld = (new Date() - new Date(ticket.Date)) / (1000 * 60 * 60 * 24);
-                    if (daysOld > 7) {
-                        statusClass = 'status-in-progress';
-                        statusText = 'Older';
-                    } else if (daysOld > 3) {
-                        statusClass = 'status-in-progress';
-                        statusText = 'In Progress';
-                    }
-                } catch (e) {}
-
-                row.innerHTML = `
-                    <td><span class="ticket-id">${ticket['Ticket ID'] || 'N/A'}</span></td>
-                    <td class="date-cell">${formattedDate}</td>
-                    <td>
-                        <div class="talent-name">${ticket['Talent Name'] || 'N/A'}</div>
-                        <div class="talent-email">${ticket['Talent Email'] || ''}</div>
-                    </td>
-                    <td>
-                        <div class="problem-tag">${ticket['Problem Encountered'] || 'Not specified'}</div>
-                        <div class="problem-desc">${ticket['Description'] || 'No description'}</div>
-                    </td>
-                    <td>
-                        <div class="mis-personnel">
-                            <i class="fas fa-user-cog"></i>
-                            ${ticket['Preferred MIS Personnel'] || 'Unassigned'}
-                        </div>
-                    </td>
-                    <td><span class="regulation-area">${ticket['Regulation Area'] || 'N/A'}</span></td>
-                    <td>
-                        <span class="status-badge ${statusClass}">
-                            <i class="fas fa-circle"></i>${statusText}
-                        </span>
-                    </td>
-                `;
-                ticketsBody.appendChild(row);
-            });
-        }
-
-        // Filter Tickets
-        function filterTickets() {
-            const term = searchInput.value.toLowerCase().trim();
-            if (!term) {
-                renderTickets(allTickets);
-                return;
-            }
-
-            const filtered = allTickets.filter(ticket =>
-                Object.values(ticket).some(value =>
-                    value && value.toString().toLowerCase().includes(term)
-                )
-            );
-            renderTickets(filtered);
-        }
-
-        // Update Time Display
-        function updateLastUpdatedTime() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', {
-                hour: '2-digit', minute: '2-digit', second: '2-digit'
-            });
-            lastUpdatedTime.textContent = `Last updated: ${timeString}`;
-        }
-    </script>
+    // Update Time Display (unchanged)
+    function updateLastUpdatedTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', {
+            hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+        lastUpdatedTime.textContent = `Last updated: ${timeString}`;
+    }
+</script>
 </body>
+
 </html>
