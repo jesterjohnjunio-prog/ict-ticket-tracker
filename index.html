@@ -19,7 +19,118 @@
             box-shadow: 0 8px 30px rgba(0, 0, 100, 0.08);
             border: 1px solid #e1e8f0;
         }
-
+        
+        /* IMPROVED TEXT LAYOUT */
+        .problem-cell {
+            max-width: 300px;
+            min-width: 250px;
+        }
+        
+        .problem-desc {
+            color: #718096;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 4.2em; /* Shows exactly 3 lines */
+        }
+        
+        .mis-personnel-cell {
+            min-width: 150px;
+        }
+        
+        .regulation-cell {
+            min-width: 140px;
+        }
+        
+        .ticket-id-cell {
+            min-width: 120px;
+        }
+        
+        .date-cell {
+            min-width: 100px;
+            white-space: nowrap;
+        }
+        
+        .talent-cell {
+            min-width: 180px;
+        }
+        
+        .status-cell {
+            min-width: 110px;
+        }
+        
+        /* Better table column widths */
+        .tickets-table {
+            table-layout: fixed;
+            width: 100%;
+        }
+        
+        .tickets-table th:nth-child(1) { width: 10%; } /* Ticket ID */
+        .tickets-table th:nth-child(2) { width: 9%; }  /* Date */
+        .tickets-table th:nth-child(3) { width: 15%; } /* Talent */
+        .tickets-table th:nth-child(4) { width: 28%; } /* Problem & Description */
+        .tickets-table th:nth-child(5) { width: 13%; } /* MIS Personnel */
+        .tickets-table th:nth-child(6) { width: 12%; } /* Regulation Area */
+        .tickets-table th:nth-child(7) { width: 8%; }  /* Status */  /* IMPROVED TEXT LAYOUT */
+        .problem-cell {
+            max-width: 300px;
+            min-width: 250px;
+        }
+        
+        .problem-desc {
+            color: #718096;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 4.2em; /* Shows exactly 3 lines */
+        }
+        
+        .mis-personnel-cell {
+            min-width: 150px;
+        }
+        
+        .regulation-cell {
+            min-width: 140px;
+        }
+        
+        .ticket-id-cell {
+            min-width: 120px;
+        }
+        
+        .date-cell {
+            min-width: 100px;
+            white-space: nowrap;
+        }
+        
+        .talent-cell {
+            min-width: 180px;
+        }
+        
+        .status-cell {
+            min-width: 110px;
+        }
+        
+        /* Better table column widths */
+        .tickets-table {
+            table-layout: fixed;
+            width: 100%;
+        }
+        
+        .tickets-table th:nth-child(1) { width: 10%; } /* Ticket ID */
+        .tickets-table th:nth-child(2) { width: 9%; }  /* Date */
+        .tickets-table th:nth-child(3) { width: 15%; } /* Talent */
+        .tickets-table th:nth-child(4) { width: 28%; } /* Problem & Description */
+        .tickets-table th:nth-child(5) { width: 13%; } /* MIS Personnel */
+        .tickets-table th:nth-child(6) { width: 12%; } /* Regulation Area */
+        .tickets-table th:nth-child(7) { width: 8%; }  /* Status */
         /* HEADER */
         .dashboard-header {
             background: linear-gradient(to right, #3a7bd5, #00d2ff);
@@ -420,7 +531,7 @@
         else stopAutoRefresh();
     }
 
-    // NEW & SIMPLIFIED: Load Tickets from Google Sheets
+     // Fixed: Load Tickets from Google Sheets with correct column mapping
     async function loadTickets() {
         try {
             refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
@@ -428,7 +539,7 @@
             ticketsLoading.style.display = 'block';
             ticketsTable.style.display = 'none';
 
-            // METHOD 1: Direct Google Sheets JSON feed (most reliable)
+            // Use Google Sheets JSON API
             const jsonUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&tq&sheet=${encodeURIComponent(SHEET_NAME)}`;
             
             console.log('Fetching from:', jsonUrl);
@@ -436,24 +547,29 @@
             const response = await fetch(jsonUrl);
             const text = await response.text();
             
-            // Parse the Google Visualization API response
+            // Parse the response
             const json = JSON.parse(text.substring(47, text.length-2));
             
-            // Process the data
+            // Process data with CORRECT column mapping
             const tickets = [];
             const rows = json.table.rows;
             
             for (let i = 0; i < rows.length; i++) {
                 const cells = rows[i].c;
+                
+                // FIXED COLUMN MAPPING:
+                // A=0:Ticket ID, B=1:Date, C=2:Talent Name, 
+                // D=3:Problem, E=4:Description, F=5:MIS Personnel, 
+                // G=6:Talent Email, H=7:Regulation Area
                 const ticket = {
                     'Ticket ID': cells[0] ? cells[0].v : '',
                     'Date': cells[1] ? formatDate(cells[1].v) : '',
                     'Talent Name': cells[2] ? cells[2].v : '',
                     'Problem Encountered': cells[3] ? cells[3].v : '',
                     'Description': cells[4] ? cells[4].v : '',
-                    'Preferred MIS Personnel': cells[5] ? cells[5].v : '',
+                    'Preferred MIS Personnel': cells[5] ? cells[5].v : '', // Column F
                     'Talent Email': cells[6] ? cells[6].v : '',
-                    'Regulation Area': cells[7] ? cells[7].v : ''
+                    'Regulation Area': cells[7] ? cells[7].v : '' // Column H
                 };
                 tickets.push(ticket);
             }
@@ -465,15 +581,7 @@
 
         } catch (error) {
             console.error('Error loading tickets:', error);
-            
-            // METHOD 2: Fallback to CSV format
-            try {
-                console.log('Trying CSV fallback...');
-                await loadTicketsCSV();
-            } catch (csvError) {
-                console.error('CSV fallback also failed:', csvError);
-                showError();
-            }
+            showError();
         } finally {
             refreshBtn.innerHTML = '<i class="fas fa-redo-alt"></i> Refresh Tickets';
             refreshBtn.disabled = false;
@@ -611,25 +719,27 @@
                 }
             } catch (e) {}
 
-            row.innerHTML = `
-                <td><span class="ticket-id">${ticket['Ticket ID'] || 'N/A'}</span></td>
+                row.innerHTML = `
+                <td class="ticket-id-cell"><span class="ticket-id">${ticket['Ticket ID'] || 'N/A'}</span></td>
                 <td class="date-cell">${formattedDate}</td>
-                <td>
+                <td class="talent-cell">
                     <div class="talent-name">${ticket['Talent Name'] || 'N/A'}</div>
                     <div class="talent-email">${ticket['Talent Email'] || ''}</div>
                 </td>
-                <td>
+                <td class="problem-cell">
                     <div class="problem-tag">${ticket['Problem Encountered'] || 'Not specified'}</div>
-                    <div class="problem-desc">${ticket['Description'] || 'No description'}</div>
+                    <div class="problem-desc" title="${ticket['Description'] || ''}">${ticket['Description'] || 'No description'}</div>
                 </td>
-                <td>
+                <td class="mis-personnel-cell">
                     <div class="mis-personnel">
                         <i class="fas fa-user-cog"></i>
                         ${ticket['Preferred MIS Personnel'] || 'Unassigned'}
                     </div>
                 </td>
-                <td><span class="regulation-area">${ticket['Regulation Area'] || 'N/A'}</span></td>
-                <td>
+                <td class="regulation-cell">
+                    <span class="regulation-area">${ticket['Regulation Area'] || 'N/A'}</span>
+                </td>
+                <td class="status-cell">
                     <span class="status-badge ${statusClass}">
                         <i class="fas fa-circle"></i>${statusText}
                     </span>
@@ -667,3 +777,4 @@
 </body>
 
 </html>
+
