@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ICT Concerns Ticket Tracker</title>
+    <title>ICT Concerns - New Tickets Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
@@ -88,7 +88,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 1000px;
+            min-width: 800px;
         }
         
         th {
@@ -145,15 +145,6 @@
             gap: 5px;
         }
         
-        .regulation-area {
-            background: #f0fff4;
-            color: #38a169;
-            padding: 5px 12px;
-            border-radius: 5px;
-            border: 1px solid #c6f6d5;
-            font-size: 0.9rem;
-        }
-        
         .loading {
             text-align: center;
             padding: 60px 20px;
@@ -180,11 +171,11 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1><i class="fas fa-ticket-alt"></i> ICT Concerns Ticket Tracker</h1>
+            <h1><i class="fas fa-ticket-alt"></i> ICT Concerns - New Tickets Tracker</h1>
             <div class="stats">
                 <div class="stat-card">
                     <div class="stat-value" id="totalTickets">0</div>
-                    <div>Total Tickets</div>
+                    <div>New Tickets</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="todayTickets">0</div>
@@ -194,15 +185,11 @@
                     <div class="stat-value" id="uniquePersonnel">0</div>
                     <div>MIS Personnel</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="regulationAreas">0</div>
-                    <div>Regulation Areas</div>
-                </div>
             </div>
         </div>
         
         <div class="controls">
-            <input type="text" id="searchInput" placeholder="Search tickets...">
+            <input type="text" id="searchInput" placeholder="Search new tickets...">
             <button id="refreshBtn" class="refresh-btn">
                 <i class="fas fa-redo-alt"></i> Refresh
             </button>
@@ -211,7 +198,7 @@
         <div class="table-container">
             <div id="loading" class="loading">
                 <i class="fas fa-spinner fa-spin fa-2x"></i>
-                <p>Loading tickets...</p>
+                <p>Loading new tickets...</p>
             </div>
             
             <div id="error" class="error" style="display: none;">
@@ -227,10 +214,9 @@
                         <th>Ticket ID</th>
                         <th>Date</th>
                         <th>Talent Name</th>
-                        <th>Problem</th>
-                        <th>MIS Personnel</th>
-                        <th>Regulation Area</th>
-                        <th>Status</th>
+                        <th>Problem Encountered</th>
+                        <th>Description</th>
+                        <th>Preferred MIS Personnel</th>
                     </tr>
                 </thead>
                 <tbody id="ticketsBody"></tbody>
@@ -239,7 +225,6 @@
     </div>
 
     <script>
-        // SIMPLE DIRECT APPROACH - NO PROXY NEEDED
         async function loadTickets() {
             const loading = document.getElementById('loading');
             const error = document.getElementById('error');
@@ -250,10 +235,10 @@
             table.style.display = 'none';
             
             try {
-                // METHOD 1: Try CSV format (most reliable)
-                const csvUrl = 'https://docs.google.com/spreadsheets/d/1vY0L3v-iXj2NcU7SRgucuJTKZEOYOmZYTnAMfrO1Atw/export?format=csv';
+                // Use CSV export from the Active Tickets sheet (gid=1959752412)
+                const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSlQLcK_Ktw2zemNHDZ_70giWPqT54Mvoci_dJxQz1RWYhe94UaDQLPQU89DUYLTY-ow7s2sWa-PB0h/pub?gid=1959752412&single=true&output=csv';
                 
-                console.log('Loading from:', csvUrl);
+                console.log('Loading from Active Tickets sheet:', csvUrl);
                 
                 const response = await fetch(csvUrl);
                 const csvText = await response.text();
@@ -262,36 +247,39 @@
                 const rows = csvText.split('\n');
                 const tickets = [];
                 
-                // Skip header row (row 0)
+                // Filter for "New" tickets - adjust this logic based on your sheet structure
+                // If you have a status column, you can add filtering here
                 for (let i = 1; i < rows.length; i++) {
                     if (rows[i].trim() === '') continue;
                     
-                    // Parse CSV row (handle commas in description)
+                    // Parse CSV row
                     const cols = parseCSVRow(rows[i]);
                     
-                    if (cols.length >= 8) {
+                    // Only use columns A-F (0-5)
+                    if (cols.length >= 6) {
                         const ticket = {
                             'Ticket ID': cols[0] || '',
                             'Date': cols[1] || '',
                             'Talent Name': cols[2] || '',
                             'Problem Encountered': cols[3] || '',
                             'Description': cols[4] || '',
-                            'Preferred MIS Personnel': cols[5] || '', // Column F
-                            'Talent Email': cols[6] || '',
-                            'Regulation Area': cols[7] || '' // Column H
+                            'Preferred MIS Personnel': cols[5] || '' // Column F
                         };
+                        
+                        // Add filtering logic here for "New" tickets
+                        // Example: if (ticket.Status === 'New') tickets.push(ticket);
+                        // For now, pushing all tickets from Active Tickets sheet
                         tickets.push(ticket);
                     }
                 }
                 
-                console.log('Loaded', tickets.length, 'tickets');
-                console.log('First ticket:', tickets[0]);
+                console.log('Loaded', tickets.length, 'new tickets from Active Tickets sheet');
                 
                 if (tickets.length > 0) {
                     displayTickets(tickets);
                     updateStats(tickets);
                 } else {
-                    throw new Error('No tickets found in sheet');
+                    throw new Error('No tickets found in Active Tickets sheet');
                 }
                 
             } catch (err) {
@@ -343,39 +331,20 @@
                     }
                 } catch (e) {}
                 
-                // Status based on date
-                let status = 'New';
-                let statusColor = '#38a169';
-                try {
-                    const daysOld = (new Date() - new Date(ticket.Date)) / (1000 * 60 * 60 * 24);
-                    if (daysOld > 7) {
-                        status = 'Older';
-                        statusColor = '#e53e3e';
-                    } else if (daysOld > 3) {
-                        status = 'In Progress';
-                        statusColor = '#d69e2e';
-                    }
-                } catch (e) {}
-                
                 row.innerHTML = `
                     <td><span class="ticket-id">${ticket['Ticket ID'] || 'N/A'}</span></td>
                     <td>${date}</td>
-                    <td>
-                        <strong>${ticket['Talent Name'] || 'N/A'}</strong><br>
-                        <small>${ticket['Talent Email'] || ''}</small>
-                    </td>
+                    <td><strong>${ticket['Talent Name'] || 'N/A'}</strong></td>
                     <td>
                         <div class="problem-tag">${ticket['Problem Encountered'] || 'Not specified'}</div>
-                        <div class="description">${ticket['Description'] || 'No description'}</div>
                     </td>
+                    <td><div class="description">${ticket['Description'] || 'No description'}</div></td>
                     <td>
                         <span class="mis-personnel">
                             <i class="fas fa-user"></i>
                             ${ticket['Preferred MIS Personnel'] || 'Unassigned'}
                         </span>
                     </td>
-                    <td><span class="regulation-area">${ticket['Regulation Area'] || 'N/A'}</span></td>
-                    <td style="color: ${statusColor}; font-weight: bold;">${status}</td>
                 `;
                 
                 tbody.appendChild(row);
@@ -401,9 +370,6 @@
             
             const personnel = [...new Set(tickets.map(t => t['Preferred MIS Personnel']).filter(Boolean))];
             document.getElementById('uniquePersonnel').textContent = personnel.length;
-            
-            const areas = [...new Set(tickets.map(t => t['Regulation Area']).filter(Boolean))];
-            document.getElementById('regulationAreas').textContent = areas.length;
         }
         
         // Initialize
