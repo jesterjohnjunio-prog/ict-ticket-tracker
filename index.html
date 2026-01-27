@@ -8,7 +8,7 @@
     <style>
         /* RESET & BASE */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { color: #333; background: white; } /* Gray background removed */
+        body { color: #333; background: white; }
 
         /* MAIN CONTAINER */
         .container {
@@ -19,118 +19,7 @@
             box-shadow: 0 8px 30px rgba(0, 0, 100, 0.08);
             border: 1px solid #e1e8f0;
         }
-        
-        /* IMPROVED TEXT LAYOUT */
-        .problem-cell {
-            max-width: 300px;
-            min-width: 250px;
-        }
-        
-        .problem-desc {
-            color: #718096;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-height: 4.2em; /* Shows exactly 3 lines */
-        }
-        
-        .mis-personnel-cell {
-            min-width: 150px;
-        }
-        
-        .regulation-cell {
-            min-width: 140px;
-        }
-        
-        .ticket-id-cell {
-            min-width: 120px;
-        }
-        
-        .date-cell {
-            min-width: 100px;
-            white-space: nowrap;
-        }
-        
-        .talent-cell {
-            min-width: 180px;
-        }
-        
-        .status-cell {
-            min-width: 110px;
-        }
-        
-        /* Better table column widths */
-        .tickets-table {
-            table-layout: fixed;
-            width: 100%;
-        }
-        
-        .tickets-table th:nth-child(1) { width: 10%; } /* Ticket ID */
-        .tickets-table th:nth-child(2) { width: 9%; }  /* Date */
-        .tickets-table th:nth-child(3) { width: 15%; } /* Talent */
-        .tickets-table th:nth-child(4) { width: 28%; } /* Problem & Description */
-        .tickets-table th:nth-child(5) { width: 13%; } /* MIS Personnel */
-        .tickets-table th:nth-child(6) { width: 12%; } /* Regulation Area */
-        .tickets-table th:nth-child(7) { width: 8%; }  /* Status */  /* IMPROVED TEXT LAYOUT */
-        .problem-cell {
-            max-width: 300px;
-            min-width: 250px;
-        }
-        
-        .problem-desc {
-            color: #718096;
-            font-size: 0.9rem;
-            line-height: 1.4;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-height: 4.2em; /* Shows exactly 3 lines */
-        }
-        
-        .mis-personnel-cell {
-            min-width: 150px;
-        }
-        
-        .regulation-cell {
-            min-width: 140px;
-        }
-        
-        .ticket-id-cell {
-            min-width: 120px;
-        }
-        
-        .date-cell {
-            min-width: 100px;
-            white-space: nowrap;
-        }
-        
-        .talent-cell {
-            min-width: 180px;
-        }
-        
-        .status-cell {
-            min-width: 110px;
-        }
-        
-        /* Better table column widths */
-        .tickets-table {
-            table-layout: fixed;
-            width: 100%;
-        }
-        
-        .tickets-table th:nth-child(1) { width: 10%; } /* Ticket ID */
-        .tickets-table th:nth-child(2) { width: 9%; }  /* Date */
-        .tickets-table th:nth-child(3) { width: 15%; } /* Talent */
-        .tickets-table th:nth-child(4) { width: 28%; } /* Problem & Description */
-        .tickets-table th:nth-child(5) { width: 13%; } /* MIS Personnel */
-        .tickets-table th:nth-child(6) { width: 12%; } /* Regulation Area */
-        .tickets-table th:nth-child(7) { width: 8%; }  /* Status */
+
         /* HEADER */
         .dashboard-header {
             background: linear-gradient(to right, #3a7bd5, #00d2ff);
@@ -247,7 +136,16 @@
             width: 100%;
             border-collapse: collapse;
             min-width: 1200px;
+            table-layout: fixed;
         }
+        .tickets-table th:nth-child(1) { width: 10%; }
+        .tickets-table th:nth-child(2) { width: 9%; }
+        .tickets-table th:nth-child(3) { width: 15%; }
+        .tickets-table th:nth-child(4) { width: 28%; }
+        .tickets-table th:nth-child(5) { width: 13%; }
+        .tickets-table th:nth-child(6) { width: 12%; }
+        .tickets-table th:nth-child(7) { width: 8%; }
+        
         .table-header {
             background-color: #f1f5f9;
             position: sticky;
@@ -275,6 +173,16 @@
             color: #4a5568;
             vertical-align: top;
         }
+        
+        /* CELL STYLES */
+        .ticket-id-cell { min-width: 120px; }
+        .date-cell { min-width: 100px; white-space: nowrap; font-size: 0.95rem; color: #64748b; }
+        .talent-cell { min-width: 180px; }
+        .problem-cell { max-width: 300px; min-width: 250px; }
+        .mis-personnel-cell { min-width: 150px; }
+        .regulation-cell { min-width: 140px; }
+        .status-cell { min-width: 110px; }
+        
         .ticket-id {
             font-weight: 700;
             color: #2d3748;
@@ -284,11 +192,6 @@
             border-radius: 8px;
             display: inline-block;
             font-size: 0.95rem;
-        }
-        .date-cell {
-            white-space: nowrap;
-            font-size: 0.95rem;
-            color: #64748b;
         }
         .talent-name {
             font-weight: 600;
@@ -311,8 +214,14 @@
         }
         .problem-desc {
             color: #718096;
-            font-size: 0.95rem;
-            line-height: 1.5;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 4.2em;
         }
         .mis-personnel {
             display: inline-flex;
@@ -481,300 +390,264 @@
     </div>
 
     <script>
-    // Configuration
-    const SHEET_ID = '1vY0L3v-iXj2NcU7SRgucuJTKZEOYOmZYTnAMfrO1Atw'; // From your URL
-    const SHEET_NAME = 'Active tickets'; // Your sheet name
-    const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
-    
-    // State
-    let allTickets = [];
-    let autoRefreshInterval;
-    
-    // DOM Elements
-    const searchInput = document.getElementById('searchInput');
-    const refreshBtn = document.getElementById('refreshBtn');
-    const ticketsBody = document.getElementById('ticketsBody');
-    const ticketsTable = document.getElementById('ticketsTable');
-    const ticketsLoading = document.getElementById('ticketsLoading');
-    const lastUpdatedTime = document.getElementById('lastUpdatedTime');
-    const totalTicketsEl = document.getElementById('totalTickets');
-    const todayTicketsEl = document.getElementById('todayTickets');
-    const uniquePersonnelEl = document.getElementById('uniquePersonnel');
-    const regulationAreasEl = document.getElementById('regulationAreas');
+        // Configuration
+        const SHEET_ID = '1vY0L3v-iXj2NcU7SRgucuJTKZEOYOmZYTnAMfrO1Atw';
+        const SHEET_NAME = 'Active tickets';
+        const AUTO_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
+        
+        // State
+        let allTickets = [];
+        let autoRefreshInterval;
+        
+        // DOM Elements
+        const searchInput = document.getElementById('searchInput');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const ticketsBody = document.getElementById('ticketsBody');
+        const ticketsTable = document.getElementById('ticketsTable');
+        const ticketsLoading = document.getElementById('ticketsLoading');
+        const lastUpdatedTime = document.getElementById('lastUpdatedTime');
+        const totalTicketsEl = document.getElementById('totalTickets');
+        const todayTicketsEl = document.getElementById('todayTickets');
+        const uniquePersonnelEl = document.getElementById('uniquePersonnel');
+        const regulationAreasEl = document.getElementById('regulationAreas');
 
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        loadTickets();
-        setupEventListeners();
-        startAutoRefresh();
-    });
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTickets();
+            setupEventListeners();
+            startAutoRefresh();
+        });
 
-    // Event Listeners
-    function setupEventListeners() {
-        refreshBtn.addEventListener('click', loadTickets);
-        searchInput.addEventListener('input', filterTickets);
-        document.getElementById('autoRefreshToggle').addEventListener('change', toggleAutoRefresh);
-    }
+        // Event Listeners
+        function setupEventListeners() {
+            refreshBtn.addEventListener('click', loadTickets);
+            searchInput.addEventListener('input', filterTickets);
+            document.getElementById('autoRefreshToggle').addEventListener('change', toggleAutoRefresh);
+        }
 
-    // Auto-refresh
-    function startAutoRefresh() {
-        if (autoRefreshInterval) clearInterval(autoRefreshInterval);
-        autoRefreshInterval = setInterval(loadTickets, AUTO_REFRESH_INTERVAL);
-    }
+        // Auto-refresh
+        function startAutoRefresh() {
+            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+            autoRefreshInterval = setInterval(loadTickets, AUTO_REFRESH_INTERVAL);
+        }
 
-    function stopAutoRefresh() {
-        if (autoRefreshInterval) clearInterval(autoRefreshInterval);
-    }
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+        }
 
-    function toggleAutoRefresh(e) {
-        if (e.target.checked) startAutoRefresh();
-        else stopAutoRefresh();
-    }
+        function toggleAutoRefresh(e) {
+            if (e.target.checked) startAutoRefresh();
+            else stopAutoRefresh();
+        }
 
-     // Fixed: Load Tickets from Google Sheets with correct column mapping
-    async function loadTickets() {
-        try {
-            refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
-            refreshBtn.disabled = true;
-            ticketsLoading.style.display = 'block';
-            ticketsTable.style.display = 'none';
+        // Load Tickets from Google Sheets - FIXED COLUMN MAPPING
+        async function loadTickets() {
+            try {
+                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                refreshBtn.disabled = true;
+                ticketsLoading.style.display = 'block';
+                ticketsTable.style.display = 'none';
 
-            // Use Google Sheets JSON API
-            const jsonUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&tq&sheet=${encodeURIComponent(SHEET_NAME)}`;
-            
-            console.log('Fetching from:', jsonUrl);
-            
-            const response = await fetch(jsonUrl);
-            const text = await response.text();
-            
-            // Parse the response
-            const json = JSON.parse(text.substring(47, text.length-2));
-            
-            // Process data with CORRECT column mapping
-            const tickets = [];
-            const rows = json.table.rows;
-            
-            for (let i = 0; i < rows.length; i++) {
-                const cells = rows[i].c;
+                // Use Google Sheets JSON API with CORS proxy
+                const jsonUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&tq&sheet=${encodeURIComponent(SHEET_NAME)}`;
                 
-                // FIXED COLUMN MAPPING:
-                // A=0:Ticket ID, B=1:Date, C=2:Talent Name, 
+                console.log('Fetching from:', jsonUrl);
+                
+                // Use CORS proxy to avoid restrictions
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(jsonUrl)}`;
+                const response = await fetch(proxyUrl);
+                const data = await response.json();
+                
+                // Parse the response
+                const json = JSON.parse(data.contents.substring(47, data.contents.length-2));
+                
+                // Process data with CORRECT column mapping:
+                // Column A=0:Ticket ID, B=1:Date, C=2:Talent Name, 
                 // D=3:Problem, E=4:Description, F=5:MIS Personnel, 
                 // G=6:Talent Email, H=7:Regulation Area
-                const ticket = {
-                    'Ticket ID': cells[0] ? cells[0].v : '',
-                    'Date': cells[1] ? formatDate(cells[1].v) : '',
-                    'Talent Name': cells[2] ? cells[2].v : '',
-                    'Problem Encountered': cells[3] ? cells[3].v : '',
-                    'Description': cells[4] ? cells[4].v : '',
-                    'Preferred MIS Personnel': cells[5] ? cells[5].v : '', // Column F
-                    'Talent Email': cells[6] ? cells[6].v : '',
-                    'Regulation Area': cells[7] ? cells[7].v : '' // Column H
-                };
-                tickets.push(ticket);
-            }
+                const tickets = [];
+                const rows = json.table.rows;
+                
+                for (let i = 0; i < rows.length; i++) {
+                    const cells = rows[i].c;
+                    const ticket = {
+                        'Ticket ID': cells[0] ? String(cells[0].v) : '',
+                        'Date': cells[1] ? formatDate(cells[1].v) : '',
+                        'Talent Name': cells[2] ? String(cells[2].v) : '',
+                        'Problem Encountered': cells[3] ? String(cells[3].v) : '',
+                        'Description': cells[4] ? String(cells[4].v) : '',
+                        'Preferred MIS Personnel': cells[5] ? String(cells[5].v) : '', // Column F
+                        'Talent Email': cells[6] ? String(cells[6].v) : '',
+                        'Regulation Area': cells[7] ? String(cells[7].v) : '' // Column H
+                    };
+                    tickets.push(ticket);
+                }
 
-            allTickets = tickets;
-            updateStats(tickets);
-            renderTickets(tickets);
-            updateLastUpdatedTime();
+                allTickets = tickets;
+                updateStats(tickets);
+                renderTickets(tickets);
+                updateLastUpdatedTime();
 
-        } catch (error) {
-            console.error('Error loading tickets:', error);
-            showError();
-        } finally {
-            refreshBtn.innerHTML = '<i class="fas fa-redo-alt"></i> Refresh Tickets';
-            refreshBtn.disabled = false;
-        }
-    }
-
-    // Fallback method using CSV
-    async function loadTicketsCSV() {
-        const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
-        
-        const response = await fetch(csvUrl);
-        const csvText = await response.text();
-        
-        const tickets = [];
-        const rows = csvText.split('\n');
-        
-        // Skip header row
-        for (let i = 1; i < rows.length; i++) {
-            const columns = rows[i].split(',');
-            if (columns.length >= 8) {
-                const ticket = {
-                    'Ticket ID': columns[0] || '',
-                    'Date': columns[1] || '',
-                    'Talent Name': columns[2] || '',
-                    'Problem Encountered': columns[3] || '',
-                    'Description': columns[4] || '',
-                    'Preferred MIS Personnel': columns[5] || '',
-                    'Talent Email': columns[6] || '',
-                    'Regulation Area': columns[7] || ''
-                };
-                tickets.push(ticket);
+            } catch (error) {
+                console.error('Error loading tickets:', error);
+                showError();
+            } finally {
+                refreshBtn.innerHTML = '<i class="fas fa-redo-alt"></i> Refresh Tickets';
+                refreshBtn.disabled = false;
             }
         }
-        
-        allTickets = tickets;
-        updateStats(tickets);
-        renderTickets(tickets);
-        updateLastUpdatedTime();
-    }
 
-    function formatDate(dateValue) {
-        if (!dateValue) return '';
-        
-        // If it's a serial number (Google Sheets date format)
-        if (typeof dateValue === 'number') {
-            const date = new Date((dateValue - 25569) * 86400 * 1000);
-            return date.toISOString().split('T')[0];
+        function formatDate(dateValue) {
+            if (!dateValue) return '';
+            
+            // If it's a serial number (Google Sheets date format)
+            if (typeof dateValue === 'number') {
+                const date = new Date((dateValue - 25569) * 86400 * 1000);
+                return date.toISOString().split('T')[0];
+            }
+            
+            // If it's already a date string
+            return String(dateValue);
         }
-        
-        // If it's already a date string
-        return dateValue;
-    }
 
-    function showError() {
-        ticketsLoading.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-exclamation-triangle"></i>
-                <h3>Failed to load tickets</h3>
-                <p>Possible issues:</p>
-                <ul style="text-align:left; display:inline-block; margin:15px auto;">
-                    <li>Google Sheet is not published</li>
-                    <li>Network or CORS restrictions</li>
-                    <li>Sheet name might be different</li>
-                </ul>
-                <p>Try publishing your sheet: <strong>File → Share → Publish to web</strong></p>
-                <button onclick="loadTickets()" class="refresh-btn" style="margin-top:20px;">
-                    <i class="fas fa-redo-alt"></i> Try Again
-                </button>
-            </div>
-        `;
-    }
-
-    // Update Statistics (unchanged)
-    function updateStats(tickets) {
-        totalTicketsEl.textContent = tickets.length;
-
-        const today = new Date().toISOString().split('T')[0];
-        const todayTickets = tickets.filter(t => {
-            const ticketDate = new Date(t.Date).toISOString().split('T')[0];
-            return ticketDate === today;
-        }).length;
-        todayTicketsEl.textContent = todayTickets;
-
-        const personnelSet = new Set(tickets.map(t => t['Preferred MIS Personnel']).filter(Boolean));
-        uniquePersonnelEl.textContent = personnelSet.size;
-
-        const regulationSet = new Set(tickets.map(t => t['Regulation Area']).filter(Boolean));
-        regulationAreasEl.textContent = regulationSet.size;
-    }
-
-    // Render Tickets to Table (unchanged)
-    function renderTickets(tickets) {
-        if (tickets.length === 0) {
+        function showError() {
             ticketsLoading.innerHTML = `
                 <div class="empty-state">
-                    <i class="fas fa-clipboard-list"></i>
-                    <h3>No active tickets found</h3>
-                    <p>When tickets are submitted, they will appear here.</p>
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h3>Failed to load tickets</h3>
+                    <p>Possible issues:</p>
+                    <ul style="text-align:left; display:inline-block; margin:15px auto; max-width:400px;">
+                        <li>Check internet connection</li>
+                        <li>Verify Google Sheet is published (File → Share → Publish to web)</li>
+                        <li>Sheet name must be exactly: <strong>"Active tickets"</strong></li>
+                        <li>Try again in a few moments</li>
+                    </ul>
+                    <button onclick="location.reload()" class="refresh-btn" style="margin-top:20px;">
+                        <i class="fas fa-redo-alt"></i> Reload Page
+                    </button>
                 </div>
             `;
-            ticketsTable.style.display = 'none';
-            return;
         }
 
-        ticketsLoading.style.display = 'none';
-        ticketsTable.style.display = 'table';
-        ticketsBody.innerHTML = '';
+        // Update Statistics
+        function updateStats(tickets) {
+            totalTicketsEl.textContent = tickets.length;
 
-        tickets.forEach((ticket, index) => {
-            const row = document.createElement('tr');
-            row.className = 'ticket-row';
-            if (index < 3) row.classList.add('new-ticket');
+            const today = new Date().toISOString().split('T')[0];
+            const todayTickets = tickets.filter(t => {
+                const ticketDate = new Date(t.Date).toISOString().split('T')[0];
+                return ticketDate === today;
+            }).length;
+            todayTicketsEl.textContent = todayTickets;
 
-            // Format date
-            let formattedDate = ticket.Date;
-            try {
-                const dateObj = new Date(ticket.Date);
-                if (!isNaN(dateObj.getTime())) {
-                    formattedDate = dateObj.toLocaleDateString('en-US', {
-                        month: 'short', day: 'numeric', year: 'numeric'
-                    });
-                }
-            } catch (e) {}
+            const personnelSet = new Set(tickets.map(t => t['Preferred MIS Personnel']).filter(Boolean));
+            uniquePersonnelEl.textContent = personnelSet.size;
 
-            // Determine status
-            let statusClass = 'status-new', statusText = 'New';
-            try {
-                const daysOld = (new Date() - new Date(ticket.Date)) / (1000 * 60 * 60 * 24);
-                if (daysOld > 7) {
-                    statusClass = 'status-in-progress';
-                    statusText = 'Older';
-                } else if (daysOld > 3) {
-                    statusClass = 'status-in-progress';
-                    statusText = 'In Progress';
-                }
-            } catch (e) {}
+            const regulationSet = new Set(tickets.map(t => t['Regulation Area']).filter(Boolean));
+            regulationAreasEl.textContent = regulationSet.size;
+        }
+
+        // Render Tickets to Table
+        function renderTickets(tickets) {
+            if (tickets.length === 0) {
+                ticketsLoading.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h3>No active tickets found</h3>
+                        <p>When tickets are submitted, they will appear here.</p>
+                    </div>
+                `;
+                ticketsTable.style.display = 'none';
+                return;
+            }
+
+            ticketsLoading.style.display = 'none';
+            ticketsTable.style.display = 'table';
+            ticketsBody.innerHTML = '';
+
+            tickets.forEach((ticket, index) => {
+                const row = document.createElement('tr');
+                row.className = 'ticket-row';
+                if (index < 3) row.classList.add('new-ticket');
+
+                // Format date
+                let formattedDate = ticket.Date;
+                try {
+                    const dateObj = new Date(ticket.Date);
+                    if (!isNaN(dateObj.getTime())) {
+                        formattedDate = dateObj.toLocaleDateString('en-US', {
+                            month: 'short', day: 'numeric', year: 'numeric'
+                        });
+                    }
+                } catch (e) {}
+
+                // Determine status
+                let statusClass = 'status-new', statusText = 'New';
+                try {
+                    const daysOld = (new Date() - new Date(ticket.Date)) / (1000 * 60 * 60 * 24);
+                    if (daysOld > 7) {
+                        statusClass = 'status-in-progress';
+                        statusText = 'Older';
+                    } else if (daysOld > 3) {
+                        statusClass = 'status-in-progress';
+                        statusText = 'In Progress';
+                    }
+                } catch (e) {}
 
                 row.innerHTML = `
-                <td class="ticket-id-cell"><span class="ticket-id">${ticket['Ticket ID'] || 'N/A'}</span></td>
-                <td class="date-cell">${formattedDate}</td>
-                <td class="talent-cell">
-                    <div class="talent-name">${ticket['Talent Name'] || 'N/A'}</div>
-                    <div class="talent-email">${ticket['Talent Email'] || ''}</div>
-                </td>
-                <td class="problem-cell">
-                    <div class="problem-tag">${ticket['Problem Encountered'] || 'Not specified'}</div>
-                    <div class="problem-desc" title="${ticket['Description'] || ''}">${ticket['Description'] || 'No description'}</div>
-                </td>
-                <td class="mis-personnel-cell">
-                    <div class="mis-personnel">
-                        <i class="fas fa-user-cog"></i>
-                        ${ticket['Preferred MIS Personnel'] || 'Unassigned'}
-                    </div>
-                </td>
-                <td class="regulation-cell">
-                    <span class="regulation-area">${ticket['Regulation Area'] || 'N/A'}</span>
-                </td>
-                <td class="status-cell">
-                    <span class="status-badge ${statusClass}">
-                        <i class="fas fa-circle"></i>${statusText}
-                    </span>
-                </td>
-            `;
-            ticketsBody.appendChild(row);
-        });
-    }
-
-    // Filter Tickets (unchanged)
-    function filterTickets() {
-        const term = searchInput.value.toLowerCase().trim();
-        if (!term) {
-            renderTickets(allTickets);
-            return;
+                    <td class="ticket-id-cell"><span class="ticket-id">${ticket['Ticket ID'] || 'N/A'}</span></td>
+                    <td class="date-cell">${formattedDate}</td>
+                    <td class="talent-cell">
+                        <div class="talent-name">${ticket['Talent Name'] || 'N/A'}</div>
+                        <div class="talent-email">${ticket['Talent Email'] || ''}</div>
+                    </td>
+                    <td class="problem-cell">
+                        <div class="problem-tag">${ticket['Problem Encountered'] || 'Not specified'}</div>
+                        <div class="problem-desc" title="${ticket['Description'] || ''}">${ticket['Description'] || 'No description'}</div>
+                    </td>
+                    <td class="mis-personnel-cell">
+                        <div class="mis-personnel">
+                            <i class="fas fa-user-cog"></i>
+                            ${ticket['Preferred MIS Personnel'] || 'Unassigned'}
+                        </div>
+                    </td>
+                    <td class="regulation-cell">
+                        <span class="regulation-area">${ticket['Regulation Area'] || 'N/A'}</span>
+                    </td>
+                    <td class="status-cell">
+                        <span class="status-badge ${statusClass}">
+                            <i class="fas fa-circle"></i>${statusText}
+                        </span>
+                    </td>
+                `;
+                ticketsBody.appendChild(row);
+            });
         }
 
-        const filtered = allTickets.filter(ticket =>
-            Object.values(ticket).some(value =>
-                value && value.toString().toLowerCase().includes(term)
-            )
-        );
-        renderTickets(filtered);
-    }
+        // Filter Tickets
+        function filterTickets() {
+            const term = searchInput.value.toLowerCase().trim();
+            if (!term) {
+                renderTickets(allTickets);
+                return;
+            }
 
-    // Update Time Display (unchanged)
-    function updateLastUpdatedTime() {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('en-US', {
-            hour: '2-digit', minute: '2-digit', second: '2-digit'
-        });
-        lastUpdatedTime.textContent = `Last updated: ${timeString}`;
-    }
-</script>
+            const filtered = allTickets.filter(ticket =>
+                Object.values(ticket).some(value =>
+                    value && value.toString().toLowerCase().includes(term)
+                )
+            );
+            renderTickets(filtered);
+        }
+
+        // Update Time Display
+        function updateLastUpdatedTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', {
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+            lastUpdatedTime.textContent = `Last updated: ${timeString}`;
+        }
+    </script>
 </body>
-
 </html>
-
