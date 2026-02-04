@@ -203,7 +203,7 @@
             
             <div id="error" class="error" style="display: none;">
                 <i class="fas fa-exclamation-triangle fa-2x"></i>
-                <h3>Unable to load tickets</h3>
+                <h3>No tickets found</h3>
                 <p id="errorMessage">Please check your connection and try again.</p>
                 <button onclick="loadTickets()">Try Again</button>
             </div>
@@ -279,7 +279,7 @@
                     displayTickets(tickets);
                     updateStats(tickets);
                 } else {
-                    throw new Error('No tickets found in Active Tickets sheet');
+                    throw new Error('The Active Tickets sheet is currently empty or has no valid ticket data.');
                 }
                 
             } catch (err) {
@@ -396,3 +396,4 @@
     </script>
 </body>
 </html>
+
