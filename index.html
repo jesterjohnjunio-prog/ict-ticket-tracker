@@ -298,7 +298,49 @@
     </div>
 
     <script>
-        let misActionsTickets = new Set();
+        // Global functions
+        window.copyToClipboard = function(text) {
+            // Try using the Clipboard API first
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('Close Ticket link copied to clipboard!');
+                }).catch(err => {
+                    console.error('Clipboard API failed:', err);
+                    fallbackCopyToClipboard(text);
+                });
+            } else {
+                fallbackCopyToClipboard(text);
+            }
+        };
+
+        function fallbackCopyToClipboard(text) {
+            // Fallback method using textarea
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            
+            // Make the textarea out of viewport
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            textArea.style.top = '-999999px';
+            document.body.appendChild(textArea);
+            
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast('Close Ticket link copied to clipboard!');
+                } else {
+                    showToast('Failed to copy link. Please try again.');
+                }
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+                showToast('Failed to copy link. Please try again.');
+            }
+            
+            document.body.removeChild(textArea);
+        }
 
         function showToast(message) {
             const toast = document.createElement('div');
@@ -311,14 +353,7 @@
             }, 3000);
         }
 
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                showToast('Close Ticket link copied to clipboard!');
-            }).catch(err => {
-                console.error('Failed to copy:', err);
-                showToast('Failed to copy link');
-            });
-        }
+        let misActionsTickets = new Set();
 
         async function loadMISActions() {
             try {
@@ -460,8 +495,8 @@
                     misActionButton = `<a href="https://docs.google.com/forms/d/e/1FAIpQLSdDG_28ieiFXjny-i69r0sRvC5NXb9OEKGL3I31q7E5XgYV6w/viewform?usp=pp_url&entry.525969148=Administrator+Access+(MIS+Personnel+Only)" target="_blank" class="btn btn-for-action"><i class="fas fa-tasks"></i> For Action</a>`;
                 }
                 
-                // Format Close Ticket button - now with copy functionality
-                const closeButton = `<button onclick='copyToClipboard("https://docs.google.com/forms/d/e/1FAIpQLSdDG_28ieiFXjny-i69r0sRvC5NXb9OEKGL3I31q7E5XgYV6w/viewform?usp=pp_url&entry.525969148=Close+Ticket")' class="btn btn-close"><i class="fas fa-times-circle"></i> Close Ticket</button>`;
+                // Format Close Ticket button - using window.copyToClipboard
+                const closeButton = `<button onclick="window.copyToClipboard('https://docs.google.com/forms/d/e/1FAIpQLSdDG_28ieiFXjny-i69r0sRvC5NXb9OEKGL3I31q7E5XgYV6w/viewform?usp=pp_url&entry.525969148=Close+Ticket')" class="btn btn-close"><i class="fas fa-times-circle"></i> Close Ticket</button>`;
                 
                 // Format date
                 let date = ticket.Date;
